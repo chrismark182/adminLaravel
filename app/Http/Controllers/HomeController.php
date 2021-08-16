@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Notas;
+use App\Role;
+use App\User;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -14,6 +17,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+		$this->middleware('verified');
     }
 
     /**
@@ -23,6 +27,10 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+		$count_users= User::count();
+		$count_roles= Role::count();
+		$count_notas= Notas::count();
+		
+        return view('home',compact('count_users','count_roles','count_notas'));
     }
 }

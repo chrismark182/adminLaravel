@@ -11,12 +11,14 @@
     <title>AdminLTE 3</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{asset('js/app.js')}}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
-    <script src="dist/js/adminlte.js"></script>
+	<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js" defer ></script>
+	@stack('scripts')
+    <script src="{{ asset('dist/js/adminlte.js')}}"></script>
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -25,6 +27,10 @@
     <!-- Styles -->
     <link href="{{ asset('dist/css/adminlte.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+	<link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css" rel="stylesheet">
+	
+	 <!-- Ionicons -->
+	 <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -43,7 +49,7 @@
                 <!-- SEARCH FORM -->
                 <form class="form-inline ml-3">
                     <div class="input-group input-group-sm">
-                        <input class="form-control form-control-navbar" type="search" placeholder="Search"
+                        <input class="form-control form-control-navbar" name="search" type="search" placeholder="Search"
                             aria-label="Search">
                         <div class="input-group-append">
                             <button class="btn btn-navbar" type="submit">
@@ -65,7 +71,7 @@
                             <a href="#" class="dropdown-item">
                                 <!-- Message Start -->
                                 <div class="media">
-                                    <img src="dist/img/user1-128x128.jpg" alt="User Avatar"
+                                    <img src="{{asset('dist/img/user1-128x128.jpg')}}" alt="User Avatar"
                                         class="img-size-50 mr-3 img-circle">
                                     <div class="media-body">
                                         <h3 class="dropdown-item-title">
@@ -83,7 +89,7 @@
                             <a href="#" class="dropdown-item">
                                 <!-- Message Start -->
                                 <div class="media">
-                                    <img src="dist/img/user8-128x128.jpg" alt="User Avatar"
+                                    <img src="{{asset('dist/img/user8-128x128.jpg')}}" alt="User Avatar"
                                         class="img-size-50 img-circle mr-3">
                                     <div class="media-body">
                                         <h3 class="dropdown-item-title">
@@ -101,7 +107,7 @@
                             <a href="#" class="dropdown-item">
                                 <!-- Message Start -->
                                 <div class="media">
-                                    <img src="dist/img/user3-128x128.jpg" alt="User Avatar"
+                                    <img src="{{asset('dist/img/user3-128x128.jpg')}}" alt="User Avatar"
                                         class="img-size-50 img-circle mr-3">
                                     <div class="media-body">
                                         <h3 class="dropdown-item-title">
@@ -154,7 +160,7 @@
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
-                    <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                    <img src="{{ asset('dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
                         style="opacity: .8">
                     <span class="brand-text font-weight-light">System Team</span>
                 </a>
@@ -163,14 +169,14 @@
                 <div class="sidebar">
                     <!-- Sidebar user panel (optional) -->
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                        <div class="image">
-                            <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-                        </div>
                         <div class="info">
                             <a href="#" class="d-block">
                                 @guest
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Iniciar Sesión') }}</a>
                                 @else
+							<div class="image">
+                            <img src="{{asset('imagenes/'.Auth::user()->imagen)}}" class="img-circle elevation-2" alt="User Image">
+                            </div>
                                 {{ Auth::user()->name }}
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                            document.getElementById('logout-form').submit();">
@@ -199,18 +205,32 @@
                                 </a>
                             </li>
 
+							@can('administrador')
                             <li class="nav-item">
-                                <a href="usuarios"
+                                <a href="{{url('usuarios')}} "
                                     class="{{ Request::path() === 'usuarios' ? 'nav-link active' : 'nav-link' }}">
                                     <i class="nav-icon fas fa-users"></i>
                                     <p>
                                         Usuarios
-                                        <?php use App\User; $users_count = User::all()->count(); ?>
+                                        <?php /* use App\User; $users_count = User::all()->count();*/ ?>
+										 <?php $users_count = DB::table('users')->count(); ?>
                                         <span class="right badge badge-danger">{{ $users_count ?? '0' }}</span>
                                     </p>
                                 </a>
                             </li>
-
+							@endcan
+							
+							@can('administrador')
+                            <li class="nav-item">
+                                <a href="{{url('roles')}} "
+                                    class="{{ Request::path() === 'roles' ? 'nav-link active' : 'nav-link' }}">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>Roles</p>
+                                </a>
+                            </li>
+							@endcan
+							
+							@can('moderador')
                             <li class="nav-item has-treeview">
                                 <a href="#" class="nav-link">
                                     <i class="nav-icon far fa-sticky-note"></i>
@@ -218,21 +238,21 @@
                                 </a>
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="notas/todas"
+                                        <a href="{{url('notas/todas')}}"
                                             class="{{ Request::path() === 'notas/todas' ? 'nav-link active' : 'nav-link' }}">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Todas</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="notas/favoritas"
+                                        <a href="{{url('notas/favoritas')}}"
                                             class="{{ Request::path() === 'notas/favoritas' ? 'nav-link active' : 'nav-link' }}">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Favoritas</p>
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="notas/archivadas"
+                                        <a href="{{url('notas/archivadas')}}"
                                             class="{{ Request::path() === 'notas/archivadas' ? 'nav-link active' : 'nav-link' }}">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Archivadas</p>
@@ -240,7 +260,7 @@
                                     </li>
                                 </ul>
                             </li>
-
+							@endcan
                         </ul>
                     </nav>
                     <!-- /.sidebar-menu -->

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
 
@@ -36,4 +36,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+	
+	public function roles()
+	{
+		return $this->belongsToMany(Role::class)->withTimestamps();//funcion para llenar los created_at y updated_at de una forma automatica
+	}
+	
+	public function asignarRol($role)
+	{
+		$this->roles()->sync($role,false);//
+	}
+	
+	public function tieneRol()
+	{
+		return $this->roles->flatten()->pluck('name')->unique();
+	}
 }

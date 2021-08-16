@@ -24,6 +24,12 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+		
+		//Agregado
+		Gate::before(function($user,$role)
+		{
+			return $user->tieneRol()->contains($role);
+		});
 
         //
     }
